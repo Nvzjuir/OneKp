@@ -12,6 +12,7 @@
 		<view class="link-demo">
 			<u-link :color="$u.color['primary']" :under-line="true" href="http://www.uviewui.com">跳转uView文档：www.uviewui.com</u-link>
 		</view>
+		<u-tabbar :list="tabbar" :mid-button="true"></u-tabbar>
 	</view>
 </template>
 
@@ -19,11 +20,11 @@
 	export default {
 		data() {
 			return {
-				title: 'Hello'
+				tabbar: ''
 			}
 		},
 		onLoad() {
-
+			this.tabbar = this.$store.state.tabbar
 		},
 		methods: {
 
