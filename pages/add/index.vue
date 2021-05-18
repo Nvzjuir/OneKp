@@ -67,17 +67,11 @@
 		</swiper>
 
 		<!-- 键盘 -->
-		<u-keyboard ref="uKeyboard" @change="valChange" :safe-area-inset-bottom="true" :mask-close-able="false"
-			:mask="false" @backspace="backspace" v-model="showKey" :show-tips="false">
+		<u-keyboard ref="uKeyboard" @change="valChange" :safe-area-inset-bottom="false" :mask-close-able="false"
+			:mask="false" @backspace="backspace" v-model="showKey" :tips="value">
 			<slot name="default">
-				<view style="display: flex;justify-content: space-between;">
-					<view style="text-align: left;">
-						23
-					</view>
-					<view style="text-align: right;">
-						{{value}}
-					</view>
-				</view>
+				<u-field v-model="info" label="备注" placeholder="请填写备注">
+				</u-field>
 			</slot>
 		</u-keyboard>
 
@@ -88,11 +82,10 @@
 </template>
 
 <script>
-	// icon
-	import '../../static/icon/iconfont.css'
 	export default {
 		data() {
 			return {
+				info: '',
 				tabbar: '',
 				tabsList: [{
 					name: '支出'
@@ -103,7 +96,7 @@
 				swiperCurrent: 0,
 				gridItemCurrent: '',
 				showKey: false,
-				value: '',
+				value: ' ',
 			}
 		},
 		onLoad() {
@@ -117,6 +110,7 @@
 			},
 			// 按键被点击(点击退格键不会触发此事件)
 			valChange(val) {
+				if (this.value.length > 8) return
 				// 将每次按键的值拼接到value变量中，注意+=写法
 				this.value += val;
 				console.log(this.value);
@@ -140,11 +134,23 @@
 </script>
 
 <style lang="less" scoped>
+	// icon
+	@import '../../static/icon/iconfont.css';
+
+	page,
+	.content {
+		height: 100%;
+	}
+
 	.iconfont {
 		font-size: 52rpx;
 	}
 
 	.grid-text {
 		font-size: 12rpx;
+	}
+
+	.swiper {
+		height: 100%;
 	}
 </style>
