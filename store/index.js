@@ -6,7 +6,7 @@ const store = new Vuex.Store({
 		tabbar: [{
 				iconPath: "/static/tabbar/statistics.png",
 				selectedIconPath: "/static/tabbar/statistics_selected.png",
-				text: '1',
+				text: '统计',
 				// count: 2,
 				// isDot: true,
 				pagePath: "/pages/statistics/index"
@@ -14,14 +14,14 @@ const store = new Vuex.Store({
 			{
 				iconPath: "/static/tabbar/add.png",
 				selectedIconPath: "/static/tabbar/add_selected.png",
-				text: '2',
+				text: '',
 				midButton: true,
 				pagePath: "/pages/add/index"
 			},
 			{
 				iconPath: "/static/tabbar/my.png",
 				selectedIconPath: "/static/tabbar/my_selected.png",
-				text: '3',
+				text: '我的',
 				pagePath: "/pages/my/index"
 			},
 		]

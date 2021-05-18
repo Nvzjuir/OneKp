@@ -256,7 +256,7 @@
 				border-radius: 100%;
 				width: 110rpx;
 				height: 110rpx;
-				top: -48rpx;
+				top: -34rpx;
 				position: absolute;
 				z-index: 4;
 				background-color: #ffffff;
@@ -319,7 +319,7 @@
 					align-items: center;
 					position: absolute;
 					background-color: #ffffff;
-					top: -40rpx;
+					top: -26rpx;
 					left: 50%;
 					z-index: 6;
 					transform: translateX(-50%);
