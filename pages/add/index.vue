@@ -12,7 +12,7 @@
 				<u-grid :col="4" :border="false" @click="gridClick" hover-class="gridHover">
 					<u-grid-item index="waimai" :style="{'color':(gridItemCurrent == 'waimai' ?'red':'#000')}">
 						<u-icon class="iconfont icon-waimai"></u-icon>
-						<view class="grid-text">饮食</view>
+						<view class="grid-text">饮食1</view>
 					</u-grid-item>
 					<u-grid-item index="hongbao" :style="{'color':(gridItemCurrent == 'hongbao' ?'red':'#000')}">
 						<u-icon class="iconfont icon-hongbao-m" :size="46"></u-icon>
@@ -67,13 +67,20 @@
 		</swiper>
 
 		<!-- 键盘 -->
-		<u-keyboard ref="uKeyboard" @change="valChange" :safe-area-inset-bottom="false" :mask-close-able="false"
-			:mask="false" @backspace="backspace" v-model="showKey" :tips="value">
+		<u-keyboard ref="uKeyboard" @change="valChange" :safe-area-inset-bottom="true" :mask-close-able="false"
+			:mask="false" @backspace="backspace" @confirm="keySave" v-model="showKey" :tips="value">
 			<slot name="default">
-				<u-field v-model="info" label="备注" placeholder="请填写备注">
-				</u-field>
+				<view class="keySlot">
+					<u-button @click="timeShow = true" size="mini">{{btnTime}}</u-button>
+					<u-field v-model="info" placeholder="请填写备注">
+					</u-field>
+				</view>
 			</slot>
 		</u-keyboard>
+
+		<!-- 日期选择 -->
+		<u-picker v-model="timeShow" mode="time" :start-year="startYear" :end-year="endYear" :params="timeParams">
+		</u-picker>
 
 		<!-- 自定义底部导航 -->
 		<u-tabbar :list="tabbar" :mid-button="true"></u-tabbar>
@@ -85,6 +92,14 @@
 	export default {
 		data() {
 			return {
+				timeParams: {
+					year: true,
+					month: true,
+					day: true,
+					hour: true,
+					minute: true,
+					second: false
+				},
 				info: '',
 				tabbar: '',
 				tabsList: [{
@@ -97,12 +112,28 @@
 				gridItemCurrent: '',
 				showKey: false,
 				value: ' ',
+				timeShow: false,
+				btnTime: new Date().toISOString().slice(5, 10),
+				startYear: new Date().toISOString().slice(0, 4),
+				endYear: new Date().toISOString().slice(0, 4)
 			}
 		},
 		onLoad() {
 			this.tabbar = this.$store.state.tabbar
+			// this.startYear = (new Date().toISOString().slice(0, 4) - 5).toString()
+			// this.endYear = (new Date().toISOString().slice(0, 4) + 5).toString()
+		},
+		mounted() {
+			// console.log(typeof(new Date().toISOString().slice(0, 4) - 5))
+			console.log(this.startYear)
 		},
 		methods: {
+			keySave() {
+				console.log(this.gridItemCurrent, this.value, this.info)
+				this.gridItemCurrent = ''
+				this.value = ' '
+				this.info = ''
+			},
 			tabsChange(index) {
 				this.tabsCurrent = index;
 				this.swiperCurrent = index;
@@ -139,7 +170,8 @@
 
 	page,
 	.content {
-		height: 100%;
+		height: 100vh;
+		min-height: 768rpx;
 	}
 
 	.iconfont {
@@ -152,5 +184,11 @@
 
 	.swiper {
 		height: 100%;
+	}
+
+	.keySlot {
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 </style>
