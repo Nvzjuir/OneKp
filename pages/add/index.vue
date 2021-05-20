@@ -79,7 +79,8 @@
 		</u-keyboard>
 
 		<!-- 日期选择 -->
-		<u-picker v-model="timeShow" mode="time" :start-year="startYear" :end-year="endYear" :params="timeParams">
+		<u-picker v-model="timeShow" mode="time" @confirm="timeBack" :start-year="startYear" :end-year="endYear"
+			:params="timeParams">
 		</u-picker>
 
 		<!-- 自定义底部导航 -->
@@ -96,8 +97,8 @@
 					year: true,
 					month: true,
 					day: true,
-					hour: true,
-					minute: true,
+					hour: false,
+					minute: false,
 					second: false
 				},
 				info: '',
@@ -114,22 +115,65 @@
 				value: ' ',
 				timeShow: false,
 				btnTime: new Date().toISOString().slice(5, 10),
-				startYear: new Date().toISOString().slice(0, 4),
-				endYear: new Date().toISOString().slice(0, 4)
+				startYear: '',
+				endYear: ''
 			}
 		},
 		onLoad() {
 			this.tabbar = this.$store.state.tabbar
 			// this.startYear = (new Date().toISOString().slice(0, 4) - 5).toString()
 			// this.endYear = (new Date().toISOString().slice(0, 4) + 5).toString()
+			let start = new Date().toISOString().slice(0, 4),
+				end = new Date().toISOString().slice(0, 4)
+			start = parseInt(start) - 5
+			end = parseInt(end) + 5
+			this.startYear = start
+			this.endYear = end
 		},
 		mounted() {
-			// console.log(typeof(new Date().toISOString().slice(0, 4) - 5))
-			console.log(this.startYear)
+			// #ifdef APP-PLUS
+			this.sqlLite.createTable();
+			// #endif
+			console.log(this.tabsCurrent)
 		},
 		methods: {
+			timeBack(e) {
+				console.log(e)
+				this.btnTime = e.month + '-' + e.day
+			},
 			keySave() {
-				console.log(this.gridItemCurrent, this.value, this.info)
+				console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+				// uni.onTabBarMidButtonTap(() => {
+					plus.android.requestPermissions(['android.permission.INTERNET'], function(e) {
+						console.log(e)
+						if (e.deniedAlways.length > 0) { //权限被永久拒绝  
+							// 弹出提示框解释为何需要权限，引导用户打开设置页面开启  
+							console.log('权限被永久拒绝' + e.deniedAlways.toString());
+						}
+						if (e.deniedPresent.length > 0) { //权限被临时拒绝  
+							// 弹出提示框解释为何需要权限，可再次调用plus.android.requestPermissions申请权限  
+							console.log('权限被临时拒绝' + e.deniedPresent.toString());
+						}
+						if (e.granted.length > 0) { //权限被允许  
+							console.log('权限被允许' + e.granted.toString());
+						}
+					}, function(e) {
+						console.log('Request Permissions error:' + JSON.stringify(e));
+					});
+					uni.navigateTo({
+						url: '/pages/add/index'
+					})
+				// });
+				console.log(this.gridItemCurrent, this.value, this.info, this.btnTime)
+				let SqlData = {
+					classify: this.gridItemCurrent,
+					amount: this.value,
+					time: this.btnTime,
+					info: this.info
+				}
+				console.log("SSSSSSSSSS",this.tabsCurrent)
+				this.sqlLite.insertData(SqlData,this.tabsCurrent);
+				this.sqlLite.selectSql();
 				this.gridItemCurrent = ''
 				this.value = ' '
 				this.info = ''
@@ -137,7 +181,7 @@
 			tabsChange(index) {
 				this.tabsCurrent = index;
 				this.swiperCurrent = index;
-				// console.log(index)
+				console.log(index)
 			},
 			// 按键被点击(点击退格键不会触发此事件)
 			valChange(val) {

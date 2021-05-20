@@ -5,6 +5,10 @@ Vue.config.productionTip = false
 
 App.mpType = 'app'
 
+//引入数据库操作js
+import sqlLite from './utils/sqlLite.js'
+Vue.prototype.sqlLite = sqlLite
+
 // 引入全局uView
 import uView from 'uview-ui'
 Vue.use(uView);
