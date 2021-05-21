@@ -142,28 +142,6 @@
 				this.btnTime = e.month + '-' + e.day
 			},
 			keySave() {
-				console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-				// uni.onTabBarMidButtonTap(() => {
-					plus.android.requestPermissions(['android.permission.INTERNET'], function(e) {
-						console.log(e)
-						if (e.deniedAlways.length > 0) { //权限被永久拒绝  
-							// 弹出提示框解释为何需要权限，引导用户打开设置页面开启  
-							console.log('权限被永久拒绝' + e.deniedAlways.toString());
-						}
-						if (e.deniedPresent.length > 0) { //权限被临时拒绝  
-							// 弹出提示框解释为何需要权限，可再次调用plus.android.requestPermissions申请权限  
-							console.log('权限被临时拒绝' + e.deniedPresent.toString());
-						}
-						if (e.granted.length > 0) { //权限被允许  
-							console.log('权限被允许' + e.granted.toString());
-						}
-					}, function(e) {
-						console.log('Request Permissions error:' + JSON.stringify(e));
-					});
-					uni.navigateTo({
-						url: '/pages/add/index'
-					})
-				// });
 				console.log(this.gridItemCurrent, this.value, this.info, this.btnTime)
 				let SqlData = {
 					classify: this.gridItemCurrent,
@@ -173,7 +151,6 @@
 				}
 				console.log("SSSSSSSSSS",this.tabsCurrent)
 				this.sqlLite.insertData(SqlData,this.tabsCurrent);
-				this.sqlLite.selectSql();
 				this.gridItemCurrent = ''
 				this.value = ' '
 				this.info = ''

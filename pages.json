@@ -6,20 +6,20 @@
 		{
 			"path": "pages/statistics/index",
 			"style": {
-				"navigationBarTitleText": "uView-index"
+				"navigationStyle": "custom"
 			}
-		},{
+		}, {
 			"path": "pages/add/index",
 			"style": {
-				"navigationBarTitleText": "uView-center",
+				"navigationStyle": "custom",
 				"app-plus": {
-				    "softinputMode": "adjustPan"
+					"softinputMode": "adjustPan"
 				}
 			}
 		}, {
 			"path": "pages/my/index",
 			"style": {
-				"navigationBarTitleText": "uView-center"
+				"navigationStyle": "custom"
 			}
 		}
 	],
