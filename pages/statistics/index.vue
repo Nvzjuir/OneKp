@@ -27,15 +27,16 @@
 				</view>
 			</view>
 		</view>
-		<u-card :title="title" :sub-title="subTitle" v-for="(item,index) in billData" :key="index">
-			<view class="" slot="body">
+		<u-card :title="'支出' +cardItem.sun" :sub-title="cardItem.title" v-for="(cardItem,index) in billData"
+			:key="index">
+			<view class="" slot="body" v-for="(item,index) in cardItem.body" :key="index">
 				<view class="u-body-item u-flex u-border-bottom u-row-between u-p-t-0">
 					<image
 						src="https://img11.360buyimg.com/n7/jfs/t1/94448/29/2734/524808/5dd4cc16E990dfb6b/59c256f85a8c3757.jpg"
 						mode="aspectFill"></image>
 					<view class="u-body-item-title u-line-2">{{item.classify}}</view>
 					<view>
-						-{{item.amount}}
+						{{item.istable?'+'+item.amount:'-'+item.amount}}
 					</view>
 				</view>
 			</view>
@@ -49,7 +50,7 @@
 		data() {
 			return {
 				tabbar: '',
-				billData: [],
+				billData: {},
 				year: new Date().toISOString().slice(0, 4),
 				month: new Date().toISOString().slice(5, 7),
 				monSpending: 0,
@@ -57,6 +58,7 @@
 				monSurplus: 0,
 				title: '素胚勾勒出青花，笔锋浓转淡',
 				subTitle: '2020-05-15',
+				billDataLength: 0
 			}
 		},
 		onLoad() {
@@ -64,9 +66,18 @@
 		},
 		onShow() {
 			this.sqlLite.selectSql().then(data => {
+				console.log(data)
+				this.test(data)
+				// this.billData = data.reduce((billData, item, index) => {
+				// 	console.log(index)
+				// 	billData[item.time] = billData[item.time] ? [...billData[item.time], item] : [item];
+				// 	return billData;
+				// }, {})
+				console.log(list)
+				this.billDataLength = Object.keys(this.billData).length
 				if (this.billData.length == data.length) {
 					return;
-				}else{
+				} else {
 					this.billData = data;
 					this.calMonData()
 				}
@@ -82,6 +93,42 @@
 					this.monSpending += item.amount
 				})
 				this.monSurplus = this.monIncome - this.monSpending
+			},
+			test(data) {
+				var moth = [],
+					flag = 0,
+					list = data;
+				var wdy = {
+					title: '',
+					body: '',
+					sun: 0
+				}
+				for (var i = 0; i < list.length; i++) {
+					var az = '';
+					for (var j = 0; j < moth.length; j++) {
+						if (moth[j].title == list[i]['time']) {
+							flag = 1;
+							az = j;
+							break;
+						}
+					}
+					if (flag == 1) {
+						var ab = moth[az];
+						ab.body.push(list[i]);
+						ab.sun += list[i].amount
+						flag = 0;
+
+					} else if (flag == 0) {
+						wdy = {};
+						wdy.title = list[i]['time'];
+						wdy.sun = list[i]['amount']
+						wdy.body = new Array();
+						wdy.body.push(list[i]);
+						moth.push(wdy);
+					}
+				}
+				console.log(moth)
+				this.billData = moth
 			}
 		}
 	}
