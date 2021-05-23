@@ -1,6 +1,10 @@
 <template>
 	<view class="content">
-
+		<!-- #ifdef APP-PLUS -->
+		<view class="status_bar">
+			<view class="top_view"></view>
+		</view>
+		<!-- #endif -->
 		<!-- tabs选择器 -->
 		<u-subsection class="u-margin-26" :list="tabsList" :current="tabsCurrent" mode="subsection"
 			@change="tabsChange">
@@ -9,40 +13,49 @@
 		<!-- 分类选择 -->
 		<swiper class="swiper" @change="swiperChange" :current="swiperCurrent">
 			<swiper-item>
-				<u-grid :col="4" :border="false" @click="gridClick" hover-class="gridHover">
-					<u-grid-item index="waimai" :style="{'color':(gridItemCurrent == 'waimai' ?'red':'#000')}">
+				<u-grid :col="4" :border="false" hover-class="gridHover">
+					<u-grid-item @click="gridClick('饮食','waimai')"
+						:style="{'color':(gridItemCurrent == '饮食' ?'red':'#000')}">
 						<u-icon class="iconfont icon-waimai"></u-icon>
-						<view class="grid-text">饮食1</view>
+						<view class="grid-text">饮食</view>
 					</u-grid-item>
-					<u-grid-item index="hongbao" :style="{'color':(gridItemCurrent == 'hongbao' ?'red':'#000')}">
+					<u-grid-item @click="gridClick('红包','hongbao-m')"
+						:style="{'color':(gridItemCurrent == '红包' ?'red':'#000')}">
 						<u-icon class="iconfont icon-hongbao-m" :size="46"></u-icon>
 						<view class="grid-text">红包</view>
 					</u-grid-item>
-					<u-grid-item index="lingshi" :style="{'color':(gridItemCurrent == 'lingshi' ?'red':'#000')}">
+					<u-grid-item @click="gridClick('零食','lingshi')"
+						:style="{'color':(gridItemCurrent == '零食' ?'red':'#000')}">
 						<u-icon class="iconfont icon-lingshi" :size="46"></u-icon>
 						<view class="grid-text">零食</view>
 					</u-grid-item>
-					<u-grid-item index="mao" :style="{'color':(gridItemCurrent == 'mao' ?'red':'#000')}">
+					<u-grid-item @click="gridClick('猫用品','buoumaotubiao45')"
+						:style="{'color':(gridItemCurrent == '猫用品' ?'red':'#000')}">
 						<u-icon class="iconfont icon-buoumaotubiao45" :size="46"></u-icon>
 						<view class="grid-text">猫用品</view>
 					</u-grid-item>
-					<u-grid-item index="huafei" :style="{'color':(gridItemCurrent == 'huafei' ?'red':'#000')}">
+					<u-grid-item @click="gridClick('话费','huafei')"
+						:style="{'color':(gridItemCurrent == '话费' ?'red':'#000')}">
 						<u-icon class="iconfont icon-huafei" :size="46"></u-icon>
 						<view class="grid-text">话费</view>
 					</u-grid-item>
-					<u-grid-item index="shenghuo" :style="{'color':(gridItemCurrent == 'shenghuo' ?'red':'#000')}">
+					<u-grid-item @click="gridClick('生活支出','shuifei')"
+						:style="{'color':(gridItemCurrent == '生活支出' ?'red':'#000')}">
 						<u-icon class="iconfont icon-shuifei" :size="46"></u-icon>
 						<view class="grid-text">生活支出</view>
 					</u-grid-item>
-					<u-grid-item index="zhuanzhang" :style="{'color':(gridItemCurrent == 'zhuanzhang' ?'red':'#000')}">
+					<u-grid-item index="zhuanzhang" @click="gridClick('转账','zhuanzhang')"
+						:style="{'color':(gridItemCurrent == '转账' ?'red':'#000')}">
 						<u-icon class="iconfont icon-zhuanzhang" :size="46"></u-icon>
 						<view class="grid-text">转账</view>
 					</u-grid-item>
-					<u-grid-item index="yule" :style="{'color':(gridItemCurrent == 'yule' ?'red':'#000')}">
+					<u-grid-item @click="gridClick('娱乐','ziyuan')"
+						:style="{'color':(gridItemCurrent == '娱乐' ?'red':'#000')}">
 						<u-icon class="iconfont icon-ziyuan" :size="46"></u-icon>
 						<view class="grid-text">娱乐</view>
 					</u-grid-item>
-					<u-grid-item index="yanjiu" :style="{'color':(gridItemCurrent == 'yanjiu' ?'red':'#000')}">
+					<u-grid-item @click="gridClick('烟酒','yan_')" data-test="test"
+						:style="{'color':(gridItemCurrent == '烟酒' ?'red':'#000')}">
 						<u-icon class="iconfont icon-yan_" :size="46"></u-icon>
 						<view class="grid-text">烟酒</view>
 					</u-grid-item>
@@ -50,17 +63,20 @@
 			</swiper-item>
 			<swiper-item>
 				<u-grid :col="4" :border="false">
-					<u-grid-item>
-						<u-icon class="iconfont icon-waimai"></u-icon>
-						<view class="grid-text">饮食</view>
+					<u-grid-item @click="gridClick('工资','web-icon-')" data-test="test"
+						:style="{'color':(gridItemCurrent == '工资' ?'red':'#000')}">
+						<u-icon class="iconfont icon-web-icon-" :size="46"></u-icon>
+						<view class="grid-text">工资</view>
 					</u-grid-item>
-					<u-grid-item>
+					<u-grid-item @click="gridClick('红包','hongbao-m')"
+						:style="{'color':(gridItemCurrent == '红包' ?'red':'#000')}">
 						<u-icon class="iconfont icon-hongbao-m" :size="46"></u-icon>
 						<view class="grid-text">红包</view>
 					</u-grid-item>
-					<u-grid-item>
+					<u-grid-item @click="gridClick('兼职','jianzhi')"
+						:style="{'color':(gridItemCurrent == '兼职' ?'red':'#000')}">
 						<u-icon class="iconfont icon-jianzhi" :size="46"></u-icon>
-						<view class="grid-text">零食</view>
+						<view class="grid-text">兼职</view>
 					</u-grid-item>
 				</u-grid>
 			</swiper-item>
@@ -116,7 +132,10 @@
 				timeShow: false,
 				btnTime: new Date().toISOString().slice(5, 10),
 				startYear: '',
-				endYear: ''
+				gridItemIcon: '',
+				endYear: '',
+				curYear: new Date().toISOString().slice(0, 4),
+				curMonth: new Date().toISOString().slice(5, 7)
 			}
 		},
 		onLoad() {
@@ -132,14 +151,18 @@
 		},
 		mounted() {
 			// #ifdef APP-PLUS
+			this.sqlLite.openSql();
 			this.sqlLite.createTable();
+			this.sqlLite.cloneSql();
 			// #endif
-			console.log(this.tabsCurrent)
+			console.log(this.curMonth)
 		},
 		methods: {
 			timeBack(e) {
 				console.log(e)
 				this.btnTime = e.month + '-' + e.day
+				this.curMonth = e.month
+				this.curYear = e.year
 			},
 			keySave() {
 				console.log(this.gridItemCurrent, this.value, this.info, this.btnTime)
@@ -147,10 +170,14 @@
 					classify: this.gridItemCurrent,
 					amount: this.value,
 					time: this.btnTime,
-					info: this.info
+					timeyear: this.curYear,
+					timemonth: this.curMonth,
+					info: this.info,
+					icon: this.gridItemIcon
 				}
-				console.log("SSSSSSSSSS",this.tabsCurrent)
-				this.sqlLite.insertData(SqlData,this.tabsCurrent);
+				this.sqlLite.openSql();
+				this.sqlLite.insertData(SqlData, this.tabsCurrent);
+				this.sqlLite.cloneSql();
 				this.gridItemCurrent = ''
 				this.value = ' '
 				this.info = ''
@@ -158,7 +185,6 @@
 			tabsChange(index) {
 				this.tabsCurrent = index;
 				this.swiperCurrent = index;
-				console.log(index)
 			},
 			// 按键被点击(点击退格键不会触发此事件)
 			valChange(val) {
@@ -175,11 +201,11 @@
 			},
 			swiperChange(e) {
 				this.tabsCurrent = e.detail.current
-				// this.tabsChange(e.detail.current)
 			},
-			gridClick(index) {
+			gridClick(index, icon) {
 				this.showKey = true;
 				this.gridItemCurrent = index
+				this.gridItemIcon = icon
 			}
 		}
 	}
@@ -193,6 +219,12 @@
 	.content {
 		height: 100vh;
 		min-height: 768rpx;
+	}
+
+	.status_bar {
+		height: var(--status-bar-height);
+		width: 100%;
+		background-color: #fff;
 	}
 
 	.iconfont {

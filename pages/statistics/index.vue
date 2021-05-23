@@ -1,7 +1,11 @@
 <template>
 	<view class="content">
+		<!-- #ifdef APP-PLUS -->
+		<view class="status_bar">
+		</view>
+		<!-- #endif -->
 		<view class="title">
-			<view class="titleCard" style="color: #FFBB33;">
+			<view class="titleCard" style="color: #FFBB33;" @click="showTime = true">
 				<text>{{year}}</text>
 				<text>{{month}}月</text>
 			</view>
@@ -27,20 +31,31 @@
 				</view>
 			</view>
 		</view>
-		<u-card :title="'支出' +cardItem.sun" :sub-title="cardItem.title" v-for="(cardItem,index) in billData"
-			:key="index">
+		<u-card v-for="(cardItem,index) in billData" :key="index">
+			<view class="cardHead" slot="head">
+				<view class="headLeft">
+					支出:<text style="color: red;margin-right: 2em;">{{cardItem.surplus}}</text>收入:<text
+						style="color: green;">{{cardItem.income}}</text>
+				</view>
+				<view class="headRight">
+					{{cardItem.title}}
+				</view>
+			</view>
 			<view class="" slot="body" v-for="(item,index) in cardItem.body" :key="index">
-				<view class="u-body-item u-flex u-border-bottom u-row-between u-p-t-0">
-					<image
-						src="https://img11.360buyimg.com/n7/jfs/t1/94448/29/2734/524808/5dd4cc16E990dfb6b/59c256f85a8c3757.jpg"
-						mode="aspectFill"></image>
-					<view class="u-body-item-title u-line-2">{{item.classify}}</view>
-					<view>
-						{{item.istable?'+'+item.amount:'-'+item.amount}}
+				<view class="u-flex u-border-bottom"
+					style="padding:20rpx 0; justify-content: center; align-items: center;">
+					<u-icon class="u-flex-1 iconfont" :class='"icon-" + item.icon' style="font-size: 60rpx;"></u-icon>
+					<!-- <u-icon class="iconfont icon-jianzhi" style="font-size: 52rpx;"></u-icon> -->
+					<view class="u-font-24 u-flex-2">{{item.classify}}</view>
+					<view class="u-m-r-20  u-font-20 u-line-2 u-flex-2" style="color: #dddddd;">{{item.info}}</view>
+					<view class="u-flex-1 u-flex u-row-center">
+						<text
+							:style="{'color':(item.istable?'green':'red')}">{{item.istable?'+'+item.amount:'-'+item.amount}}</text>
 					</view>
 				</view>
 			</view>
 		</u-card>
+		<u-picker v-model="showTime" mode="time" :params="params"  @confirm="timeBack" :start-year="startYear" :end-year="endYear"></u-picker>
 		<u-tabbar :list="tabbar" :mid-button="true"></u-tabbar>
 	</view>
 </template>
@@ -56,32 +71,40 @@
 				monSpending: 0,
 				monIncome: 0,
 				monSurplus: 0,
-				title: '素胚勾勒出青花，笔锋浓转淡',
-				subTitle: '2020-05-15',
-				billDataLength: 0
+				isShow: 0,
+				params: {
+					year: true,
+					month: true,
+					day: false,
+					hour: false,
+					minute: false,
+					second: false
+				},
+				showTime: false,
+				startYear:'',
+				endYear:''
 			}
 		},
 		onLoad() {
 			this.tabbar = this.$store.state.tabbar
+			let start = new Date().toISOString().slice(0, 4),
+				end = new Date().toISOString().slice(0, 4)
+			start = parseInt(start) - 5
+			end = parseInt(end) + 5
+			this.startYear = start
+			this.endYear = end
 		},
 		onShow() {
-			this.sqlLite.selectSql().then(data => {
-				console.log(data)
-				this.test(data)
-				// this.billData = data.reduce((billData, item, index) => {
-				// 	console.log(index)
-				// 	billData[item.time] = billData[item.time] ? [...billData[item.time], item] : [item];
-				// 	return billData;
-				// }, {})
-				console.log(list)
-				this.billDataLength = Object.keys(this.billData).length
-				if (this.billData.length == data.length) {
-					return;
+			this.sqlLite.openSql();
+			this.sqlLite.selectSql(this.year,this.month).then(data => {
+				if (this.isShow == data.length) {
+					return
 				} else {
-					this.billData = data;
-					this.calMonData()
+					this.isShow = data.length;
+					this.dataClassify(data)
 				}
 			})
+			this.sqlLite.cloneSql();
 		},
 		methods: {
 			// 计算月数据
@@ -90,18 +113,37 @@
 				this.monIncome = 0
 				this.monSurplus = 0
 				this.billData.forEach(item => {
-					this.monSpending += item.amount
+					this.monSpending += item.surplus
+					this.monIncome += item.income
 				})
 				this.monSurplus = this.monIncome - this.monSpending
 			},
-			test(data) {
+			timeBack(e) {
+				console.log(e)
+				// this.btnTime = e.month + '-' + e.day
+				this.year = e.year
+				this.month = e.month
+				this.sqlLite.openSql();
+				this.sqlLite.selectSql(e.year,e.month).then(data => {
+					if (this.isShow == data.length) {
+						return
+					} else {
+						this.isShow = data.length;
+						this.dataClassify(data)
+					}
+				})
+				this.sqlLite.cloneSql();
+			},
+			//数据分类
+			dataClassify(data) {
 				var moth = [],
 					flag = 0,
 					list = data;
 				var wdy = {
 					title: '',
 					body: '',
-					sun: 0
+					surplus: 0,
+					income: 0
 				}
 				for (var i = 0; i < list.length; i++) {
 					var az = '';
@@ -114,30 +156,40 @@
 					}
 					if (flag == 1) {
 						var ab = moth[az];
+						list[i].istable ? ab.income += list[i].amount : ab.surplus += list[i].amount
 						ab.body.push(list[i]);
-						ab.sun += list[i].amount
 						flag = 0;
 
 					} else if (flag == 0) {
 						wdy = {};
 						wdy.title = list[i]['time'];
-						wdy.sun = list[i]['amount']
+						// list[i]['istable'] ? wdy.income = list[i]['amount'] : wdy.surplus = list[i]['amount']
+						wdy.surplus = list[i]['istable'] ? 0 : list[i]['amount']
+						wdy.income = list[i]['istable'] ? list[i]['amount'] : 0
 						wdy.body = new Array();
 						wdy.body.push(list[i]);
 						moth.push(wdy);
 					}
 				}
-				console.log(moth)
 				this.billData = moth
+				this.calMonData();
 			}
 		}
 	}
 </script>
 
 <style lang="less" scoped>
+	// icon
+	@import '../../static/icon/iconfont.css';
+
 	page,
 	.content {
 		height: 100%;
+	}
+	.status_bar {
+		height: var(--status-bar-height);
+		width: 100%;
+		background-color: #B1DDF1;
 	}
 
 	.title {
@@ -172,5 +224,10 @@
 		height: 120rpx;
 		border-radius: 8rpx;
 		margin-left: 12rpx;
+	}
+
+	.cardHead {
+		display: flex;
+		justify-content: space-between;
 	}
 </style>

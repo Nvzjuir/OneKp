@@ -6,10 +6,10 @@ export default {
 				name: 'KpData',
 				path: '_doc/KpData.db',
 				success: function(e) {
-					resolve('openDatabase success!');
+					console.log('openDatabase success!');
 				},
 				fail: function(e) {
-					reject('openDatabase failed: ' + JSON.stringify(e));
+					console.log('openDatabase failed: ' + JSON.stringify(e));
 				}
 			});
 		})
@@ -32,12 +32,12 @@ export default {
 		return new Promise((resolve, reject) => {
 			plus.sqlite.executeSql({
 				name: 'KpData',
-				sql: 'create table if not exists database("id" INTEGER PRIMARY KEY AUTOINCREMENT,"classify" CHAR(10),"amount" DECIMAL(18,2) NOT NULL,"time" CHAR(60),"info" CHAR(60),"istable" INT(1))',
+				sql: 'create table if not exists database("id" INTEGER PRIMARY KEY AUTOINCREMENT,"classify" CHAR(10),"amount" DECIMAL(18,2) NOT NULL,"time" CHAR(60),"timeyear" CHAR(4),"timemonth" CHAR(2),"info" CHAR(60),"istable" INT(1),"icon" CHAR(20))',
 				success: function(e) {
-					resolve("cg")
+					console.log(e)
 				},
 				fail: function(e) {
-					reject("sb", e)
+					console.log(e)
 				}
 			})
 		})
@@ -45,33 +45,35 @@ export default {
 	//添加数据
 	insertData(data, isTable) {
 		console.log(data, isTable)
+		if(data.amount == 0) return;
 		return new Promise((resolve, reject) => {
 			plus.sqlite.executeSql({
 				name: 'KpData',
-				sql: 'insert into database(classify,amount,time,info,istable) values("' + data
+				sql: 'insert into database(classify,amount,time,timeyear,timemonth,info,istable,icon) values("' + data
 					.classify + '","' +
-					data.amount + '","' + data.time + '","' + data.info + '","' + isTable + '")',
+					data.amount + '","' + data.time + '","'+ data.timeyear + '","'+ data.timemonth + '","' + data.info + '","' + isTable + '","' + data.icon + '")',
 				success: function(e) {
-					resolve('executeSql success!');
+					console.log('executeSql success!');
 				},
 				fail: function(e) {
-					reject('executeSql failed: ' + JSON.stringify(e));
+					console.log('executeSql failed: ' + JSON.stringify(e));
 				}
 			});
 		})
 	},
 	//查询数据库
-	selectSql() {
+	selectSql(year,month) {
 		return new Promise((resolve, reject) => {
 			plus.sqlite.selectSql({
 				name: 'KpData',
-				sql: 'select * from database',
+				sql: 'select * from database where timeyear ="' + year + '" and timemonth = "' + month + '"',
 				success: function(data) {
+					console.log(data)
 					resolve(data);
 					// return data
 				},
 				fail: function(e) {
-					reject('selectSql failed: ' + JSON.stringify(e));
+					console.log('selectSql failed: ' + JSON.stringify(e));
 				}
 			});
 		})
