@@ -68,7 +68,6 @@ export default {
 				name: 'KpData',
 				sql: 'select * from database where timeyear ="' + year + '" and timemonth = "' + month + '"',
 				success: function(data) {
-					console.log(data)
 					resolve(data);
 					// return data
 				},

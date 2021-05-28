@@ -41,21 +41,25 @@
 					{{cardItem.title}}
 				</view>
 			</view>
-			<view class="" slot="body" v-for="(item,index) in cardItem.body" :key="index">
+			<u-swipe-action class="" slot="body" btn-width="100" v-for="(item,index) in cardItem.body" :index="index" :key="index " @click="click"
+				@open="open" :options="options">
 				<view class="u-flex u-border-bottom"
 					style="padding:20rpx 0; justify-content: center; align-items: center;">
 					<u-icon class="u-flex-1 iconfont" :class='"icon-" + item.icon' style="font-size: 60rpx;"></u-icon>
 					<!-- <u-icon class="iconfont icon-jianzhi" style="font-size: 52rpx;"></u-icon> -->
-					<view class="u-font-24 u-flex-2">{{item.classify}}</view>
-					<view class="u-m-r-20  u-font-20 u-line-2 u-flex-2" style="color: #dddddd;">{{item.info}}</view>
-					<view class="u-flex-1 u-flex u-row-center">
-						<text
-							:style="{'color':(item.istable?'green':'red')}">{{item.istable?'+'+item.amount:'-'+item.amount}}</text>
+					<view class="title-wrap">
+						<view class="u-font-24 u-flex-2">{{item.classify}}</view>
+						<view class="u-m-r-20  u-font-20 u-line-2 u-flex-2" style="color: #dddddd;">{{item.info}}</view>
+						<view class="u-flex-1 u-flex u-row-center">
+							<text
+								:style="{'color':(item.istable?'green':'red')}">{{item.istable?'+'+item.amount:'-'+item.amount}}</text>
+						</view>
 					</view>
 				</view>
-			</view>
+			</u-swipe-action>
 		</u-card>
-		<u-picker v-model="showTime" mode="time" :params="params"  @confirm="timeBack" :start-year="startYear" :end-year="endYear"></u-picker>
+		<u-picker v-model="showTime" mode="time" :params="params" @confirm="timeBack" :start-year="startYear"
+			:end-year="endYear"></u-picker>
 		<u-tabbar :list="tabbar" :mid-button="true"></u-tabbar>
 	</view>
 </template>
@@ -81,8 +85,21 @@
 					second: false
 				},
 				showTime: false,
-				startYear:'',
-				endYear:''
+				startYear: '',
+				endYear: '',
+				options: [{
+						text: '收藏',
+						style: {
+							backgroundColor: '#007aff'
+						}
+					},
+					{
+						text: '删除',
+						style: {
+							backgroundColor: '#dd524d'
+						}
+					}
+				]
 			}
 		},
 		onLoad() {
@@ -96,7 +113,7 @@
 		},
 		onShow() {
 			this.sqlLite.openSql();
-			this.sqlLite.selectSql(this.year,this.month).then(data => {
+			this.sqlLite.selectSql(this.year, this.month).then(data => {
 				if (this.isShow == data.length) {
 					return
 				} else {
@@ -107,6 +124,25 @@
 			this.sqlLite.cloneSql();
 		},
 		methods: {
+			click(index, index1) {
+				console.log(index)
+				if (index1 == 1) {
+					this.list.splice(index, 1);
+					this.$u.toast(`删除了第${index}个cell`);
+				} else {
+					this.list[index].show = false;
+					this.$u.toast(`收藏成功`);
+				}
+			},
+			// 如果打开一个的时候，不需要关闭其他，则无需实现本方法
+			open(index) {
+				// 先将正在被操作的swipeAction标记为打开状态，否则由于props的特性限制，
+				// 原本为'false'，再次设置为'false'会无效
+				this.list[index].show = true;
+				this.list.map((val, idx) => {
+					if (index != idx) this.list[idx].show = false;
+				})
+			},
 			// 计算月数据
 			calMonData() {
 				this.monSpending = 0
@@ -124,7 +160,7 @@
 				this.year = e.year
 				this.month = e.month
 				this.sqlLite.openSql();
-				this.sqlLite.selectSql(e.year,e.month).then(data => {
+				this.sqlLite.selectSql(e.year, e.month).then(data => {
 					if (this.isShow == data.length) {
 						return
 					} else {
@@ -186,6 +222,7 @@
 	.content {
 		height: 100%;
 	}
+
 	.status_bar {
 		height: var(--status-bar-height);
 		width: 100%;
