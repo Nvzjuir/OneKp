@@ -41,19 +41,21 @@
 					{{cardItem.title}}
 				</view>
 			</view>
-			<u-swipe-action class="" slot="body" btn-width="100" v-for="(item,index) in cardItem.body" :index="index" :key="index " @click="click"
-				@open="open" :options="options">
-				<view class="u-flex u-border-bottom"
+			<u-swipe-action class="" slot="body" btn-width="100" v-for="(item,index1) in cardItem.body" :index="item.id"
+				:key="item.id " @click="click" :options="options" @open="open(index,index1)" :show="item.show">
+				<view class="u-flex u-border-bottom title-wrap"
 					style="padding:20rpx 0; justify-content: center; align-items: center;">
-					<u-icon class="u-flex-1 iconfont" :class='"icon-" + item.icon' style="font-size: 60rpx;"></u-icon>
+					<!-- <view class=""> -->
+					<u-icon class="u-flex-1 iconfont" :class='"icon-" + item.icon' style="font-size: 60rpx;">
+					</u-icon>
 					<!-- <u-icon class="iconfont icon-jianzhi" style="font-size: 52rpx;"></u-icon> -->
-					<view class="title-wrap">
-						<view class="u-font-24 u-flex-2">{{item.classify}}</view>
-						<view class="u-m-r-20  u-font-20 u-line-2 u-flex-2" style="color: #dddddd;">{{item.info}}</view>
-						<view class="u-flex-1 u-flex u-row-center">
-							<text
-								:style="{'color':(item.istable?'green':'red')}">{{item.istable?'+'+item.amount:'-'+item.amount}}</text>
-						</view>
+					<view class="u-font-24 u-flex-2">{{item.classify}}</view>
+
+					<view class="u-m-r-20  u-font-20 u-line-2 u-flex-2" style="color: #dddddd;">{{item.info}}</view>
+					<view class="u-flex-1 u-flex u-row-center">
+						<text
+							:style="{'color':(item.istable?'green':'red')}">{{item.istable?'+'+item.amount:'-'+item.amount}}</text>
+						<!-- </view> -->
 					</view>
 				</view>
 			</u-swipe-action>
@@ -103,6 +105,9 @@
 			}
 		},
 		onLoad() {
+			this.sqlLite.openSql();
+			this.sqlLite.createTable();
+			this.sqlLite.cloneSql();
 			this.tabbar = this.$store.state.tabbar
 			let start = new Date().toISOString().slice(0, 4),
 				end = new Date().toISOString().slice(0, 4)
@@ -125,23 +130,29 @@
 		},
 		methods: {
 			click(index, index1) {
-				console.log(index)
+				console.log(index, index1)
 				if (index1 == 1) {
-					this.list.splice(index, 1);
-					this.$u.toast(`删除了第${index}个cell`);
+					this.sqlLite.openSql();
+					this.sqlLite.deleteSql(index);
+					this.sqlLite.selectSql(this.year, this.month).then(data => {
+						this.isShow = data.length;
+						this.dataClassify(data)
+					})
+					this.sqlLite.cloneSql();
 				} else {
-					this.list[index].show = false;
+					// this.list[index].show = false;
 					this.$u.toast(`收藏成功`);
 				}
 			},
 			// 如果打开一个的时候，不需要关闭其他，则无需实现本方法
-			open(index) {
+			open(index, index1) {
 				// 先将正在被操作的swipeAction标记为打开状态，否则由于props的特性限制，
-				// 原本为'false'，再次设置为'false'会无效
-				this.list[index].show = true;
-				this.list.map((val, idx) => {
-					if (index != idx) this.list[idx].show = false;
-				})
+				this.billData[index].body[index1].show = true;
+				for (let z = 0; z < this.billData.length; z++) {
+					this.billData[z].body.map((val, idx) => {
+						if (index1 != idx) this.billData[z].body[idx].show = false;
+					})
+				}
 			},
 			// 计算月数据
 			calMonData() {
@@ -193,6 +204,7 @@
 					if (flag == 1) {
 						var ab = moth[az];
 						list[i].istable ? ab.income += list[i].amount : ab.surplus += list[i].amount
+						list[i].show = false;
 						ab.body.push(list[i]);
 						flag = 0;
 
@@ -203,6 +215,7 @@
 						wdy.surplus = list[i]['istable'] ? 0 : list[i]['amount']
 						wdy.income = list[i]['istable'] ? list[i]['amount'] : 0
 						wdy.body = new Array();
+						list[i].show = false;
 						wdy.body.push(list[i]);
 						moth.push(wdy);
 					}

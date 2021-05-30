@@ -32,7 +32,7 @@ export default {
 		return new Promise((resolve, reject) => {
 			plus.sqlite.executeSql({
 				name: 'KpData',
-				sql: 'create table if not exists database("id" INTEGER PRIMARY KEY AUTOINCREMENT,"classify" CHAR(10),"amount" DECIMAL(18,2) NOT NULL,"time" CHAR(60),"timeyear" CHAR(4),"timemonth" CHAR(2),"info" CHAR(60),"istable" INT(1),"icon" CHAR(20))',
+				sql: 'create table if not exists database("id" INTEGER PRIMARY KEY AUTOINCREMENT,"classify" CHAR(10),"amount" DECIMAL(18,2) NOT NULL,"time" CHAR(60),"timeyear" CHAR(4),"timemonth" CHAR(2),"info" CHAR(60),"istable" INT(1),"icon" CHAR(20),"show" tinyint(1))',
 				success: function(e) {
 					console.log(e)
 				},
@@ -49,9 +49,9 @@ export default {
 		return new Promise((resolve, reject) => {
 			plus.sqlite.executeSql({
 				name: 'KpData',
-				sql: 'insert into database(classify,amount,time,timeyear,timemonth,info,istable,icon) values("' + data
+				sql: 'insert into database(classify,amount,time,timeyear,timemonth,info,istable,icon,show) values("' + data
 					.classify + '","' +
-					data.amount + '","' + data.time + '","'+ data.timeyear + '","'+ data.timemonth + '","' + data.info + '","' + isTable + '","' + data.icon + '")',
+					data.amount + '","' + data.time + '","'+ data.timeyear + '","'+ data.timemonth + '","' + data.info + '","' + isTable + '","' + data.icon + '","'+ 0 + '")',
 				success: function(e) {
 					console.log('executeSql success!');
 				},
@@ -69,6 +69,23 @@ export default {
 				sql: 'select * from database where timeyear ="' + year + '" and timemonth = "' + month + '"',
 				success: function(data) {
 					resolve(data);
+					console.log(data)
+					// return data
+				},
+				fail: function(e) {
+					console.log('selectSql failed: ' + JSON.stringify(e));
+				}
+			});
+		})
+	},
+	//删除数据
+	deleteSql(id) {
+		return new Promise((resolve, reject) => {
+			plus.sqlite.selectSql({
+				name: 'KpData',
+				sql: 'delete from database where id ="' + id + '"',
+				success: function(data) {
+					console.log(data)
 					// return data
 				},
 				fail: function(e) {
